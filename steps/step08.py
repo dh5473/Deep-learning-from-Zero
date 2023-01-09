@@ -18,7 +18,7 @@ class Variable:
             x.grad = f.backward(y.grad)  # backward 메서드 호출
 
             if x.creator is not None:
-                funcs.append(x.creator)  # 하나 앞의 함수 리스트에 추가
+                funcs.append(x.creator)  # 하나 앞의 함수를 리스트에 추가
 
 
 class Function:
