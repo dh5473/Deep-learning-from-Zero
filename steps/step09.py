@@ -5,7 +5,7 @@ class Variable:
     def __init__(self, data):
         if data is not None:
             if not isinstance(data, np.ndarray):
-                raise TypeError('{} is not supported.'.format(type(data)))
+                raise TypeError('{} is not supported'.format(type(data)))
 
         self.data = data
         self.grad = None
@@ -98,6 +98,7 @@ x = Variable(None)  # OK
 # x = Variable(1.0)  # NG: 오류 발생
 
 
+# numpy의 독특한 관례
 x = np.array(1.0)
 y = x ** 2
 print(type(x), x.ndim)  # <class 'numpy.ndarray'> 0
