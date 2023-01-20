@@ -158,6 +158,7 @@ def mul(x0, x1):
     return Mul()(x0, x1)
 
 
+# 연산자 오버로드
 Variable.__mul__ = mul
 Variable.__add__ = add
 
