@@ -26,8 +26,8 @@ x = Variable(np.array(np.pi/4))
 y = sin(x)
 y.backward()
 print("--- original sin ---")
-print(y.data)
-print(x.grad)
+print(y.data)  # 0.7071067811865476
+print(x.grad)  # 0.7071067811865476
 
 
 def my_sin(x, threshold=0.0001):
@@ -45,8 +45,8 @@ x = Variable(np.array(np.pi/4))
 y = my_sin(x)
 y.backward()
 print("--- approximate sin ---")
-print(y.data)
-print(x.grad)
+print(y.data)  # 0.7071064695751781
+print(x.grad)  # 0.7071032148228457
 
 x.name = 'x'
 y.name = 'y'
