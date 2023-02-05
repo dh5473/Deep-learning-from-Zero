@@ -48,6 +48,7 @@ print("--- approximate sin ---")
 print(y.data)  # 0.7071064695751781
 print(x.grad)  # 0.7071032148228457
 
+# create graph
 x.name = 'x'
 y.name = 'y'
 plot_dot_graph(y, verbose=False, to_file='my_sin.png')
