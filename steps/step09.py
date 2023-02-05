@@ -76,7 +76,7 @@ class Exp(Function):
 def square(x):
     # f = Square()
     # return f(x)
-    return Square()(x)  # 한 줄로 작성
+    return Square()(x)  # Create on a single line
 
 
 def exp(x):
