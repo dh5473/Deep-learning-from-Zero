@@ -47,7 +47,7 @@ class Variable:
     
     @property
     def ndim(self):
-        return self.ndim.shape
+        return self.data.ndim
 
     @property
     def size(self):
@@ -102,7 +102,7 @@ class Variable:
                     x.grad = x.grad + gx
                 
                 if x.creator is not None:
-                    funcs.append(x.creator)
+                    add_func(x.creator)
             
             if not retain_grad:
                 for y in f.outputs:
