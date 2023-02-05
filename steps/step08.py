@@ -13,12 +13,12 @@ class Variable:
     def backward(self):
         funcs = [self.creator]
         while funcs:
-            f = funcs.pop()  # 함수 가져오기
-            x, y = f.input, f.output  # 함수의 입력, 출력 가져오기
-            x.grad = f.backward(y.grad)  # backward 메서드 호출
+            f = funcs.pop()
+            x, y = f.input, f.output
+            x.grad = f.backward(y.grad) 
 
             if x.creator is not None:
-                funcs.append(x.creator)  # 하나 앞의 함수를 리스트에 추가
+                funcs.append(x.creator)
 
 
 class Function:
