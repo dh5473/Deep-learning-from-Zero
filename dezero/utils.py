@@ -78,3 +78,28 @@ def plot_dot_graph(output, verbose=True, to_file='graph.png'):
         return display.Image(filename=to_file)
     except:
         pass
+
+
+# =============================================================================
+# Utility functions for numpy (numpy magic)
+# =============================================================================
+def reshape_sum_backward(gy, x_shape, axis, keepdims):
+    """Reshape gradient appropriately for dezero.functions.sum's backward.
+    """
+    ndim = len(x_shape)
+    tupled_axis = axis
+    if axis is None:
+        tupled_axis = None
+    elif not isinstance(axis, tuple):
+        tupled_axis = (axis,)
+    
+    if not (ndim == 0 or tupled_axis is None or keepdims):
+        actual_axis = [a if a >= 0 else a + ndim for a in tupled_axis]
+        shape = list(gy.shape)
+        for a in sorted(actual_axis):
+            shape.insert(a, 1)
+    else:
+        shape = gy.shape
+
+    gy = gy.reshape(shape)
+    return gy
