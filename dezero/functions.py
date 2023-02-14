@@ -118,7 +118,27 @@ def sum(x, axis=None, keepdims=False):
     return Sum(axis, keepdims)(x)
 
 
-class BroadcastTO(Function):
+class SumTo(Function):
+    def __init__(self, shape):
+        self.shape = shape
+    
+    def forward(self, x):
+        self.x_shape = x.shape
+        y = utils.sum_to(x, self.shape)
+        return y
+
+    def backward(self, gy):
+        gx = broadcast_to(gy, self.x_shape)
+        return gx
+
+
+def sum_to(x, shape):
+    if x.shape == shape:
+        return as_variable(x)
+    return SumTo(shape)(x)
+
+
+class BroadcastTo(Function):
     def __init__(self, shape):
         self.shape = shape
 
@@ -135,4 +155,4 @@ class BroadcastTO(Function):
 def broadcast_to(x, shape):
     if x.shape == shape:
         return as_variable(x)
-    return BroadcastTO(shape)(x)
+    return BroadcastTo(shape)(x)
