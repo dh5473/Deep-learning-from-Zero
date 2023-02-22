@@ -9,8 +9,8 @@ import dezero.layers as L
 
 # dataset
 np.random.seed(0)
-x = np.random.randn(100, 1)
-y = np.sin(2 * np.pi * x) + np.random.randn(100, 1)
+x = np.random.rand(100, 1)
+y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
 
 l1 = L.Linear(10)  # output size
 l2 = L.Linear(1)
