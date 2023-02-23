@@ -8,6 +8,7 @@ if is_simple_core:
     from dezero.core_simple import as_array
     from dezero.core_simple import as_variable
     from dezero.core_simple import setup_variable
+
 else:
     from dezero.core import Variable
     from dezero.core import Parameter
@@ -18,8 +19,11 @@ else:
     from dezero.core import as_variable
     from dezero.core import setup_variable
     from dezero.core import Config
+    from dezero.layers import Layer
+    from dezero.models import Model
 
     import dezero.functions
+    import dezero.layers
     import dezero.utils
 
 setup_variable()
