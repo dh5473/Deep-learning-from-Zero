@@ -110,6 +110,39 @@ def transpose(x, axes=None):
     return Transpose(axes)(x)
 
 
+class GetItem(Function):
+    def __init__(self, slices):
+        self.slices = slices
+    
+    def forward(self, x):
+        y = x[self.slices]
+        return y
+    
+    def backward(self, gy):
+        x, = self.inputs
+        f = GetItemGrad(self.slices, x.shape)
+        return f(gy)
+
+
+class GetItemGrad(Function):
+    def __init__(self, slices, in_shape):
+        self.slices = slices
+        self.in_shape = in_shape
+
+    def forward(self, gy):
+        gx = np.zeros(self.in_shape)
+        np.add.at(gx, self.slices, gy)
+        return gx
+    
+    def backward(self, ggx):
+        return get_item(ggx, self.slices)
+
+
+def get_item(x, slices):
+    f = GetItem(slices)
+    return f(x)
+
+
 # =============================================================================
 # sum / sum_to / broadcast_to / average / matmul / linear
 # =============================================================================
@@ -241,18 +274,40 @@ def sigmoid_simple(x):
     x = as_variable(x)
     y = 1 / (1 + exp(-x))
     return y
+
+
+class Softmax(Function):
+    def __init__(self, axis=1):
+        self.axis = axis
     
+    def forward(self, x):
+        y = x - x.max(axis=self.axis, keepdims=True)
+        y = np.exp(y)
+        y /= y.sum(axis=self.axis, keepdims=True)
+        return y
+    
+    def backward(self, gy):
+        y = self.outputs[0]()
+        gx = y * gy
+        sumdx = gx.sum(axis=self.axis, keepdims=True)
+        gx -= y * sumdx
+        return gx
+
+
+def softmax(x, axis=1):
+    return Softmax(axis)(x)
+
+
+def softmax_simple(x, axis=1):
+    x = as_variable(x)
+    y = exp(x)
+    sum_y = sum(y, axis=axis, keepdims=True)
+    return y / sum_y
+
 
 # =============================================================================
 # loss function: mean_squared_error / softmax_cross_entropy / sigmoid_cross_entropy / binary_cross_entropy
 # =============================================================================
-def mean_squared_error_simple(x0, x1):
-    x0, x1 = as_variable(x0), as_variable(x1)
-    diff = x0 - x1
-    y = sum(diff ** 2) / len(diff)
-    return y
-
-
 class MeanSquaredError(Function):
     def forward(self, x0, x1):
         diff = x0 - x1
@@ -269,3 +324,65 @@ class MeanSquaredError(Function):
 
 def mean_squared_error(x0, x1):
     return MeanSquaredError()(x0, x1)
+
+
+def mean_squared_error_simple(x0, x1):
+    x0, x1 = as_variable(x0), as_variable(x1)
+    diff = x0 - x1
+    y = sum(diff ** 2) / len(diff)
+    return y
+
+
+# =============================================================================
+# accuracy / dropout / batch_norm / embed_id
+# =============================================================================
+
+
+# =============================================================================
+# max / min / clip
+# =============================================================================
+class Max(Function):
+    def __init__(self, axis=None, keepdims=False):
+        self.axis = axis
+        self.keepdims = keepdims
+    
+    def forward(self, x):
+        y = x.max(axis=self.axis, keepdims=self.keepdims)
+        return y
+    
+    def backward(self, gy):
+        x = self.inputs[0]
+        y = self.outputs[0]()
+
+        shape = utils.max_backward_shape(x, self.axis)
+        gy = reshape(gy, shape)
+        y = reshape(y, shape)
+        cond = (x.data == y.data)
+        gy = broadcast_to(gy, cond.shape)
+        return gy * cond
+
+
+class Min(Max):
+    def forward(self, x):
+        y = x.min(axis=self.axis, keepdims=self.keepdims)
+        return y
+
+
+def max(x, axis=None, keepdims=False):
+    return Max(axis, keepdims)(x)
+
+
+def min(x, axis=None, keepdims=False):
+    return Min(axis, keepdims)(x)
+
+
+# =============================================================================
+# conv2d / col2im / im2col / basic_math
+# =============================================================================
+from dezero.core import add
+from dezero.core import sub
+from dezero.core import rsub
+from dezero.core import mul
+from dezero.core import div
+from dezero.core import neg
+from dezero.core import pow
